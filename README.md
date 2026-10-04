@@ -39,10 +39,12 @@ stow */          # or name packages: stow khal khard vdirsyncer
 | Package | Links into `~` | What it's for |
 |---|---|---|
 | `alacritty` | `.config/alacritty/alacritty.toml` | Alacritty terminal. Colours come from `theme.toml`, which is generated, not tracked |
+| `bash` | `.bashrc`, `.bash_profile` | Shell startup: mise activation, Bazzite's bling, and aliases (`e` for `emacsclient -nw`, `fastfetch` using the config below) |
 | `atuin` | `.config/atuin/config.toml` | Shell history search |
 | `emacs` | `.config/emacs/`, `emacs.service`, `emacsclient.desktop` | Emacs Writing Studio config with personal modules, a daemon tied to the graphical session, and a client launcher |
 | `environment` | `.config/environment.d/intel-gtk-fix.conf` | Session environment: `GSK_RENDERER=gl` for GTK 4 on Intel graphics |
 | `homebrew` | `.Brewfile` | Homebrew packages (aria2, atuin, bat, eza, ripgrep, starship, zoxide…) for `brew bundle --global` |
+| `fastfetch` | `.config/fastfetch/config.jsonc` | Bazzite's fastfetch layout plus a line counting mise tools and pipx-style apps, which fastfetch can't detect itself |
 | `gh` | `.config/gh/config.yml` | GitHub CLI settings (git over SSH) |
 | `glow` | `.config/glow/glow.yml` | Markdown viewer |
 | `khal` | `.config/khal/config` | Calendar (Google and EteSync), reading what vdirsyncer syncs |
@@ -132,7 +134,6 @@ want in the repo, delete the other from `~`, and stow again.
   theme scripts.
 - **App state and keys**: libvirt VMs, VPN clients, KDE Connect, browser
   profiles.
-- **Shell startup files** (`~/.bashrc`): not tracked yet.
 
 ## Expects
 
@@ -141,3 +142,9 @@ Some packages call programs that aren't in the image or this repo:
 - `emacsclient.desktop` runs `emacs-launch`.
 - `alacritty.toml` imports `theme.toml`, written by `desk-theme`.
 - Alacritty itself.
+
+## Keeping in sync
+
+- The `fastfetch` package is a copy of Bazzite's config
+  (`/usr/share/ublue-os/bazzite/fastfetch.jsonc`). If Bazzite changes its
+  layout, copy it again and re-add the mise line.
