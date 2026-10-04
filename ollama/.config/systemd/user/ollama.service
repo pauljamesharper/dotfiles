@@ -3,6 +3,9 @@ Description=Ollama server
 After=network-online.target
 
 [Service]
+# opencode needs room for its system prompt + tool schemas; 16k on
+# deepseek-r1:8b uses about 7.5 GB RAM (the 4k default truncates them).
+Environment=OLLAMA_CONTEXT_LENGTH=16384
 ExecStart=%h/.local/share/mise/shims/ollama serve
 Restart=on-failure
 
