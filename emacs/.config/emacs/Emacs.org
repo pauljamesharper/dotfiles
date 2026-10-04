@@ -316,8 +316,64 @@ echo-area buffers, and that is the row whose descenders were being clipped."
   (("C-c w t t" . modus-themes-toggle)
    ("C-c w t m" . modus-themes-select)
    ("C-c w t s" . consult-theme)))
+#+end_src
 
-(load-theme 'modus-vivendi-tinted :no-confirm)
+Follow the desktop theme. Picking a theme or wallpaper in Mango runs
+=wallpaper-theme=, which writes the palette to
+=~/.cache/wallpaper-theme/emacs-palette.el= and calls
+=my/wallpaper-palette-apply= in the running daemon, so Emacs recolors along
+with the bar, kitty and GTK. The palette goes in as Modus overrides: Modus keeps
+its own legible mapping (keywords, strings, diffs, Org headings) but in the
+theme's colors, with =modus-operandi= for light themes and =modus-vivendi= for
+dark ones. Without a palette file it falls back to plain =modus-vivendi-tinted=.
+Run =M-x my/wallpaper-palette-apply= to re-read the file by hand.
+
+#+begin_src emacs-lisp
+(defvar my/wallpaper-palette-file
+  (expand-file-name "wallpaper-theme/emacs-palette.el"
+                    (or (getenv "XDG_CACHE_HOME") "~/.cache"))
+  "Palette written by the desktop's wallpaper-theme script.")
+
+(defun my/wallpaper-palette-apply ()
+  "Load Modus in the desktop theme's colors, or plain Modus without a palette."
+  (interactive)
+  (let ((palette (when (file-readable-p my/wallpaper-palette-file)
+                   (with-temp-buffer
+                     (insert-file-contents my/wallpaper-palette-file)
+                     (read (current-buffer))))))
+    (mapc #'disable-theme custom-enabled-themes)
+    (if (not palette)
+        (progn
+          (setq modus-themes-common-palette-overrides nil)
+          (load-theme 'modus-vivendi-tinted :no-confirm))
+      (let-alist palette
+        (let ((overrides
+               `((bg-main ,.bg) (bg-dim ,.altbg) (bg-alt ,.altbg)
+                 (bg-active ,.border) (bg-inactive ,.bg)
+                 (fg-main ,.fg) (fg-dim ,.disabled) (fg-alt ,.secondary)
+                 (border ,.border) (cursor ,.primary)
+                 (bg-region ,.border) (fg-region ,.fg)
+                 (bg-hl-line ,.altbg)
+                 (bg-mode-line-active ,.altbg) (fg-mode-line-active ,.fg)
+                 (border-mode-line-active ,.primary)
+                 (bg-mode-line-inactive ,.bg) (fg-mode-line-inactive ,.disabled)
+                 (border-mode-line-inactive ,.border))))
+          ;; ANSI 1-6 are red..cyan, 9-14 their bright versions. Modus's
+          ;; warmer/cooler/faint variants all take the base hue so the
+          ;; syntax colors stay within the theme's palette.
+          (seq-do-indexed
+           (lambda (hue i)
+             (let ((base (aref .ansi (1+ i)))
+                   (bright (aref .ansi (+ 9 i))))
+               (dolist (suffix '("" "-warmer" "-cooler" "-faint"))
+                 (push (list (intern (concat hue suffix)) base) overrides))
+               (push (list (intern (concat hue "-intense")) bright) overrides)))
+           '("red" "green" "yellow" "blue" "magenta" "cyan"))
+          (setq modus-themes-common-palette-overrides overrides)
+          (load-theme (if (eq .mode 'light) 'modus-operandi 'modus-vivendi)
+                      :no-confirm))))))
+
+(my/wallpaper-palette-apply)
 #+end_src
 
 ** Nerd Icons
