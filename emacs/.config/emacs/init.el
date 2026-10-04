@@ -197,12 +197,6 @@ echo-area buffers, and that is the row whose descenders were being clipped."
 
 (load-theme 'modus-vivendi-tinted :no-confirm)
 
-(use-package omarchy-emacs-theme
-  :ensure t
-  :vc (:url "https://github.com/berenddeboer/omarchy-emacs-theme")
-  :config
-  (omarchy-emacs-theme-load))
-
 (use-package nerd-icons
   :ensure t)
 

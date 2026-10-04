@@ -320,28 +320,6 @@ echo-area buffers, and that is the row whose descenders were being clipped."
 (load-theme 'modus-vivendi-tinted :no-confirm)
 #+end_src
 
-Follow whatever palette [[https://omarchy.org/][Omarchy]] has active instead, via
-[[https://github.com/berenddeboer/omarchy-emacs-theme][omarchy-emacs-theme]]. It disables other custom themes by default, so once it
-applies it replaces the explicit =modus-vivendi-tinted= load above; Modus is
-still what it falls back to if no Omarchy palette has been generated yet.
-
-#+begin_src emacs-lisp
-(use-package omarchy-emacs-theme
-  :ensure t
-  :vc (:url "https://github.com/berenddeboer/omarchy-emacs-theme")
-  :config
-  (omarchy-emacs-theme-load))
-#+end_src
-
-One-time setup outside Emacs, after the package above has installed at least
-once: this installs the package's Omarchy-side hook and color template, which
-is what makes an already-running Emacs daemon reload when the Omarchy theme
-changes rather than only picking up the palette at the next Emacs startup.
-
-#+begin_src bash :tangle no
-find ~/.config/emacs -path '*omarchy-emacs-theme*/bin/omarchy-emacs-theme-setup' -exec {} \;
-#+end_src
-
 ** Nerd Icons
 
 Icon fonts used in Dired and the minibuffer. Run =M-x nerd-icons-install-fonts=
