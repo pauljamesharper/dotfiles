@@ -1,0 +1,23 @@
+# Colours live in theme.toml, which desk-theme rewrites; Alacritty reloads it live.
+[general]
+import = ["~/.config/alacritty/theme.toml"]
+live_config_reload = true
+
+[window]
+padding = { x = 10, y = 8 }
+dynamic_padding = true
+decorations = "None"
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+size = 11.0
+
+[scrolling]
+history = 10000
+
+[selection]
+save_to_clipboard = true
+
+[terminal.shell]
+program = "/usr/bin/bash"
+args = ["-l"]

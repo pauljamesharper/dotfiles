@@ -1,0 +1,10 @@
+[Unit]
+Description=Ollama server
+After=network-online.target
+
+[Service]
+ExecStart=%h/.local/share/mise/shims/ollama serve
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

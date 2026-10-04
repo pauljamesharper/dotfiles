@@ -1,0 +1,82 @@
+[general]
+status_path = "~/.config/vdirsyncer/calendars/status"
+
+[pair etesync]
+a = "etesync_local"
+b = "etesync_remote"
+collections = ["IGf72zqyZyS0XerVrG1qUfT5ePm4ld_s"]
+metadata = ["displayname"]
+
+[storage etesync_local]
+type = "filesystem"
+path = "~/.config/vdirsyncer/calendars/etesync"
+fileext = ".ics"
+
+[storage etesync_remote]
+type = "caldav"
+#Can be obtained from Etesync Dav Server on http://localhost:37358/username/ Collection List.
+url = "http://localhost:37358/gluesniffmonkey/IGf72zqyZyS0XerVrG1qUfT5ePm4ld_s/"
+username = "gluesniffmonkey"
+#Instead of inserting my plaintext password I fetch it using pass
+password.fetch = ["command", "pass", "etesync"]
+
+#Create a new sync connection between two storages we will define
+[pair etesync_contacts]
+a = "etesync_contacts_local"
+b = "etesync_contacts_remote"
+collections = ["VNjjNP3Zho1M8OrUC32l1cEOgxJ4URLF"]
+metadata = ["displayname"]
+
+# A local storage to store the contacts
+[storage etesync_contacts_local]
+type = "filesystem"
+# Path to where to store the vcards
+path = "~/.config/vdirsyncer/contacts/etesync"
+fileext = ".vcf"
+
+# A remote storage to etesync
+[storage etesync_contacts_remote]
+type = "carddav"
+# Can be obtained from http://localhost:37358/username/ Collection List.
+url = "http://localhost:37358/gluesniffmonkey/VNjjNP3Zho1M8OrUC32l1cEOgxJ4URLF/"
+username = "gluesniffmonkey"
+# Shell command which calls the external command pass and reads the password etesync
+password.fetch = ["command", "pass", "etesync"]
+
+##########################################################################################################################################
+
+[pair google_sync]
+a = "google"
+b = "googlelocal"
+collections = ["from a", "from b"]
+conflict_resolution = "a wins"
+metadata = ["color"]
+
+[storage google]
+type = "google_calendar"
+token_file = "~/.vdirsyncer/google_calendar_token"
+client_id = "228890079584-o1e1bknt1uiv0pha51aj8b2le8tng6oo.apps.googleusercontent.com"
+client_secret.fetch = ["command", "pass", "show", "google/vdirsyncer/client_secret"]
+
+[storage googlelocal]
+type = "filesystem"
+path = "~/.config/vdirsyncer/calendars/google"
+fileext = ".ics"
+
+# Google Contacts
+[pair address_sync]
+a = "googlecard"
+b = "localcard"
+collections = ["from a", "from b"]
+conflict_resolution = "a wins"
+
+[storage googlecard]
+type = "google_contacts"
+token_file = "~/.vdirsyncer/google_token_khard"
+client_id = "228890079584-o1e1bknt1uiv0pha51aj8b2le8tng6oo.apps.googleusercontent.com"
+client_secret.fetch = ["command", "pass", "show", "google/vdirsyncer/client_secret"]
+
+[storage localcard]
+type = "filesystem"
+path = "~/.config/vdirsyncer/contacts/google"
+fileext = ".vcf"

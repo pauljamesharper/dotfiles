@@ -1,0 +1,26 @@
+[Desktop Entry]
+# A launcher entry that attaches to the `emacs.service` systemd --user daemon
+# instead of cold-starting a fresh Emacs. Shown alongside the stock
+# /usr/share/applications/emacs.desktop ("Emacs", standalone).
+#   --alternate-editor=  (empty) => start a daemon first if none is running.
+Name=Emacs (Client)
+GenericName=Text Editor
+Comment=Edit text — attaches to the Emacs daemon
+Keywords=emacsclient;emacs;daemon;editor;
+Exec=emacs-launch %F
+TryExec=emacs-launch
+Icon=emacs
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;
+StartupNotify=true
+StartupWMClass=Emacs
+Actions=new-frame;standalone;
+
+[Desktop Action new-frame]
+Name=New Frame
+Exec=emacs-launch %F
+
+[Desktop Action standalone]
+Name=New Standalone Instance (no daemon)
+Exec=emacs %F

@@ -1,0 +1,25 @@
+[tools]
+# Python the pypi tools build their venvs on, so a Fedora image update
+# that bumps /usr/bin/python3 can't break them
+python = "3.14"
+uv = "latest"
+
+# AI
+claude = "latest"
+opencode = "latest"
+ollama = "latest"
+
+# Calendars and contacts
+"pypi:vdirsyncer" = { version = "latest", extras = "google" }
+"pypi:khal" = "latest"
+"pypi:khard" = "latest"
+"pypi:todoman" = "latest"
+
+# Accounting
+"pypi:beancount" = "latest"
+"pypi:beangulp" = "latest"
+"pypi:fava" = "latest"
+
+[tasks.ollama-models]
+description = "Pull the Ollama models (needs ollama.service running)"
+run = "ollama pull deepseek-r1:8b"

@@ -1,0 +1,21 @@
+[calendars]
+
+[[google]]
+path = ~/.config/vdirsyncer/calendars/google/*
+color = dark blue
+type = discover
+
+[[Etesync]]
+path = ~/.config/vdirsyncer/calendars/etesync/*
+color = yellow
+type = discover
+
+[locale]
+timeformat = %H:%M
+dateformat = %Y-%m-%d
+longdateformat = %Y-%m-%d %a
+datetimeformat = %Y-%m-%d %H:%M
+longdatetimeformat = %Y-%m-%d %H:%M
+local_timezone= Asia/Damascus 
+default_timezone= Asia/Damascus
+
