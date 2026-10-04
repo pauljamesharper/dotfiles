@@ -16,8 +16,9 @@ ollama = "latest"
 "pypi:todoman" = "latest"
 
 # Accounting
-"pypi:beancount" = "latest"
-"pypi:beangulp" = "latest"
+# beangulp (importers) is a library with no commands of its own, so it
+# goes into beancount's venv
+"pypi:beancount" = { version = "latest", uvx_args = "--with beangulp" }
 "pypi:fava" = "latest"
 
 [tasks.ollama-models]
