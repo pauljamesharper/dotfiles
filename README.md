@@ -19,6 +19,7 @@ On a bazzite_mango machine:
 ```bash
 ujust dotfiles   # clone to ~/dotfiles (or pull), then stow every package
 mise install     # install the CLI tools listed in the mise package
+brew bundle --global   # install the Homebrew packages in ~/.Brewfile
 ```
 
 `ujust dotfiles` clones over HTTPS, so it works before your SSH key is
@@ -41,6 +42,7 @@ stow */          # or name packages: stow khal khard vdirsyncer
 | `atuin` | `.config/atuin/config.toml` | Shell history search |
 | `emacs` | `.config/emacs/`, `emacs.service`, `emacsclient.desktop` | Emacs Writing Studio config with personal modules, a daemon tied to the graphical session, and a client launcher |
 | `environment` | `.config/environment.d/intel-gtk-fix.conf` | Session environment: `GSK_RENDERER=gl` for GTK 4 on Intel graphics |
+| `homebrew` | `.Brewfile` | Homebrew packages (aria2, atuin, bat, eza, ripgrep, starship, zoxide…) for `brew bundle --global` |
 | `gh` | `.config/gh/config.yml` | GitHub CLI settings (git over SSH) |
 | `glow` | `.config/glow/glow.yml` | Markdown viewer |
 | `khal` | `.config/khal/config` | Calendar (Google and EteSync), reading what vdirsyncer syncs |
@@ -57,7 +59,12 @@ stow */          # or name packages: stow khal khard vdirsyncer
 Some packages need a one-off step:
 
 ```bash
-# Services
+# Emacs: the first start downloads every package in the config, which on a
+# slow connection outlasts the service's start timeout. Run it once by hand,
+# and press Ctrl+C when the log goes quiet.
+emacs --fg-daemon
+
+# Services (Emacs then starts with every graphical login)
 systemctl --user daemon-reload
 systemctl --user enable --now emacs.service ollama.service
 
