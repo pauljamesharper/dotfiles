@@ -1,0 +1,3 @@
+#!/bin/sh
+# Open a frame on the Emacs daemon in the `emacs` distrobox; start one if none is running.
+exec "$HOME/.local/bin/emacsclient" -c -a '' "$@"

@@ -21,6 +21,8 @@
 (use-package doc-view
   :custom
   (doc-view-resolution 300)
+  ;; Not under /tmp: the LibreOffice Flatpak can't see the host's /tmp
+  (doc-view-cache-directory (expand-file-name "doc-view" user-emacs-directory))
   (large-file-warning-threshold (* 50 (expt 2 20))))
 
 ;; Read ePub files with Nov.el

@@ -1,0 +1,4 @@
+#!/bin/sh
+# LibreOffice Flatpak as `soffice`. Works on the host and inside distroboxes,
+# where `flatpak` forwards to the host.
+exec flatpak run org.libreoffice.LibreOffice "$@"

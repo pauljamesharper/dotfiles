@@ -87,8 +87,8 @@ The configuration is organised around the EWS research and writing workflow:
 
 ** Shell PATH for the Daemon
 
-Emacs runs as a daemon started by systemd (=emacs.service=, tied to
-=graphical-session.target=), so it never sees a login shell and misses the
+Emacs runs as a daemon in the =emacs= distrobox, started at login by KDE's
+autostart (=emacs-daemon.desktop=), so it never sees a login shell and misses the
 Homebrew =PATH= that =/etc/profile.d/brew.sh= sets.  [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]
 asks a login shell for =PATH= and copies it into both =exec-path= and the
 environment inherited by subprocesses.  Placed before the modules load so
@@ -1042,6 +1042,8 @@ bibliography of references.
 (use-package doc-view
   :custom
   (doc-view-resolution 300)
+  ;; Not under /tmp: the LibreOffice Flatpak can't see the host's /tmp
+  (doc-view-cache-directory (expand-file-name "doc-view" user-emacs-directory))
   (large-file-warning-threshold (* 50 (expt 2 20))))
 
 ;; Read ePub files with Nov.el
