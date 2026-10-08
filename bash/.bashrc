@@ -35,6 +35,10 @@ alias fastfetch='/usr/bin/fastfetch -c ~/.config/fastfetch/config.jsonc'
 
 # Emacs in the terminal, through the running daemon
 alias e='emacsclient -nw'
+# Editor for git, crontab, sudoedit and friends: a terminal frame on the
+# Emacs daemon, starting one if none is running (empty --alternate-editor)
+export EDITOR='emacsclient -t --alternate-editor='
+export VISUAL="$EDITOR"
 ### bling.sh source start
 test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
 ### bling.sh source end
