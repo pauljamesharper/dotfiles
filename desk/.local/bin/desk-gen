@@ -1,0 +1,165 @@
+#!/usr/bin/env python3
+"""Generate KDE, Konsole, Alacritty and Rofi colours for every theme in ~/.config/desk/themes.
+
+Each theme dir holds theme.conf (palette + gtk/icons names) and foot-colors.ini
+(the 16-colour terminal palette), in the format of JustAGuy's sway themes.
+Output goes to ~/.config/desk/generated/<theme>/ plus the KDE and Konsole
+scheme folders, where desk-theme picks it up.
+"""
+import os
+import re
+from pathlib import Path
+
+HOME = Path.home()
+THEMES = HOME / ".config/desk/themes"
+OUT = HOME / ".config/desk/generated"
+KDE_SCHEMES = HOME / ".local/share/color-schemes"
+KONSOLE = HOME / ".local/share/konsole"
+
+
+def read_kv(path):
+    kv = {}
+    for line in path.read_text().splitlines():
+        line = line.split("#", 1)[0] if not re.match(r"^\s*\w+\s*=\s*#", line) else line
+        if "=" in line and not line.strip().startswith("["):
+            k, v = line.split("=", 1)
+            kv[k.strip()] = v.strip()
+    return kv
+
+
+def hexc(v):
+    v = v.strip().lstrip("#")
+    return "#" + v.lower()
+
+
+def rgb(h):
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def to_hex(c):
+    return "#" + "".join(f"{max(0, min(255, round(x))):02x}" for x in c)
+
+
+def mix(a, b, t):
+    """Blend colour a towards b by t (0..1)."""
+    ra, rb = rgb(a), rgb(b)
+    return to_hex([x + (y - x) * t for x, y in zip(ra, rb)])
+
+
+def lum(h):
+    def ch(x):
+        x /= 255
+        return x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4
+    r, g, b = (ch(x) for x in rgb(h))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a, b):
+    la, lb = sorted([lum(a), lum(b)])
+    return (lb + 0.05) / (la + 0.05)
+
+
+def readable_on(bg, *candidates):
+    """Pick whichever candidate reads best on bg."""
+    return max(candidates, key=lambda c: contrast(bg, c))
+
+
+def kde_rgb(h):
+    return ",".join(str(x) for x in rgb(h))
+
+
+def build(tid):
+    tdir = THEMES / tid
+    conf = read_kv(tdir / "theme.conf")
+    term = read_kv(tdir / "foot-colors.ini")
+    name = conf.get("name", tid)
+    bg, bg_alt, fg = hexc(conf["bg"]), hexc(conf["bg_alt"]), hexc(conf["fg"])
+    primary, secondary = hexc(conf["primary"]), hexc(conf["secondary"])
+    alert = hexc(conf["alert"])
+    black = "#000000"
+    ansi = [hexc(term[f"regular{i}"]) for i in range(8)]
+    bright = [hexc(term[f"bright{i}"]) for i in range(8)]
+    tbg, tfg = hexc(term["background"]), hexc(term["foreground"])
+    sel_bg = hexc(term.get("selection-background", mix(tbg, tfg, 0.25)))
+    sel_fg = hexc(term.get("selection-foreground", tfg))
+
+    view = mix(bg, black, 0.2)
+    deep = mix(bg, black, 0.4)
+    inactive = mix(fg, bg, 0.45)
+    on_primary = readable_on(primary, deep, "#ffffff", fg)
+    out = OUT / tid
+    out.mkdir(parents=True, exist_ok=True)
+
+    # --- KDE colour scheme (Giants keeps its hand-made scheme) ---
+    scheme = conf.get("kde") or f"Desk{name.replace(' ', '').replace('é', 'e')}"
+    if not conf.get("kde"):
+        def group(bgn, bga, sel=False):
+            f = on_primary if sel else fg
+            return {
+                "BackgroundNormal": bgn, "BackgroundAlternate": bga,
+                "DecorationFocus": primary, "DecorationHover": secondary,
+                "ForegroundNormal": f, "ForegroundInactive": f if sel else inactive,
+                "ForegroundActive": f if sel else primary,
+                "ForegroundLink": f if sel else secondary,
+                "ForegroundVisited": f if sel else ansi[5],
+                "ForegroundNegative": alert, "ForegroundNeutral": ansi[3],
+                "ForegroundPositive": ansi[2],
+            }
+        groups = {
+            "Colors:Window": group(bg, view), "Colors:View": group(view, bg),
+            "Colors:Button": group(bg_alt, bg), "Colors:Header": group(view, bg),
+            "Colors:Header][Inactive": group(deep, view), "Colors:Tooltip": group(deep, view),
+            "Colors:Complementary": group(deep, view),
+            "Colors:Selection": group(primary, secondary, sel=True),
+        }
+        lines = ["[General]", f"ColorScheme={scheme}", f"Name={name} (desk)", "shadeSortColumn=true", "",
+                 "[KDE]", "contrast=4", "",
+                 "[ColorEffects:Disabled]", "ColorAmount=0", "ColorEffect=0", "ContrastAmount=0.65",
+                 "ContrastEffect=1", "IntensityAmount=0.1", "IntensityEffect=2", "",
+                 "[ColorEffects:Inactive]", "ChangeSelectionColor=true", "ColorAmount=0.025", "ColorEffect=2",
+                 "ContrastAmount=0.1", "ContrastEffect=2", "Enable=false", "IntensityAmount=0", "IntensityEffect=0", ""]
+        for g, vals in groups.items():
+            lines.append(f"[{g}]")
+            lines += [f"{k}={kde_rgb(v)}" for k, v in sorted(vals.items())]
+            lines.append("")
+        lines += ["[WM]", f"activeBackground={kde_rgb(view)}", f"activeBlend={kde_rgb(fg)}",
+                  f"activeForeground={kde_rgb(fg)}", f"inactiveBackground={kde_rgb(deep)}",
+                  f"inactiveBlend={kde_rgb(inactive)}", f"inactiveForeground={kde_rgb(inactive)}", ""]
+        KDE_SCHEMES.mkdir(parents=True, exist_ok=True)
+        (KDE_SCHEMES / f"{scheme}.colors").write_text("\n".join(lines))
+
+    # --- Konsole ---
+    k = ["[General]", f"Description=desk {name}", "Opacity=1", "Wallpaper=", "",
+         "[Background]", f"Color={kde_rgb(tbg)}", "", "[BackgroundIntense]", f"Color={kde_rgb(tbg)}", "",
+         "[Foreground]", f"Color={kde_rgb(tfg)}", "", "[ForegroundIntense]", f"Color={kde_rgb(bright[7])}", ""]
+    for i in range(8):
+        k += [f"[Color{i}]", f"Color={kde_rgb(ansi[i])}", "", f"[Color{i}Intense]", f"Color={kde_rgb(bright[i])}", ""]
+    KONSOLE.mkdir(parents=True, exist_ok=True)
+    (KONSOLE / f"desk-{tid}.colorscheme").write_text("\n".join(k))
+
+    # --- Alacritty ---
+    names = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"]
+    a = [f"# {name} (generated by desk-gen)", "[colors.primary]", f'background = "{tbg}"', f'foreground = "{tfg}"', "",
+         "[colors.selection]", f'background = "{sel_bg}"', f'text = "{sel_fg}"', "",
+         "[colors.cursor]", f'cursor = "{primary}"', f'text = "{tbg}"', "", "[colors.normal]"]
+    a += [f'{n} = "{c}"' for n, c in zip(names, ansi)]
+    a += ["", "[colors.bright]"] + [f'{n} = "{c}"' for n, c in zip(names, bright)]
+    (out / "alacritty.toml").write_text("\n".join(a) + "\n")
+
+    # --- Rofi ---
+    r = ["* {", f"    bg: {bg};", f"    bg-alt: {bg_alt};", f"    bg-deep: {deep};", f"    fg: {fg};",
+         f"    fg-dim: {inactive};", f"    primary: {primary};", f"    on-primary: {on_primary};",
+         f"    secondary: {secondary};", f"    border: {primary};", "}"]
+    (out / "colors.rasi").write_text("\n".join(r) + "\n")
+
+    meta = {"name": name, "scheme": scheme, "gtk": conf.get("gtk", "Breeze"),
+            "icons": conf.get("icons", "breeze-dark"), "konsole": f"desk-{tid}"}
+    (out / "meta").write_text("".join(f"{k}={v}\n" for k, v in meta.items()))
+    return name, scheme, contrast(primary, on_primary)
+
+
+if __name__ == "__main__":
+    for tid in sorted(os.listdir(THEMES)):
+        if (THEMES / tid / "theme.conf").exists():
+            name, scheme, c = build(tid)
+            print(f"{tid:12} {name:12} {scheme:18} highlight contrast {c:.1f}")

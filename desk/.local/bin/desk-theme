@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# desk-theme [theme-id]: theme picker (Super+Shift+T). Without an argument, shows a rofi menu.
+# Applies the KDE colour scheme, icons, GTK theme, Alacritty/Konsole/Rofi colours.
+set -u
+DESK=~/.config/desk
+GEN=$DESK/generated
+current=$(cat "$DESK/current" 2>/dev/null || echo giants)
+
+if [ $# -eq 0 ]; then
+    pkill -x rofi && exit 0
+    menu=""
+    for d in "$GEN"/*/; do
+        id=$(basename "$d"); name=$(sed -n 's/^name=//p' "$d/meta")
+        mark="  "; [ "$id" = "$current" ] && mark="● "
+        menu+="$mark$name"$'\t'"$id"$'\n'
+    done
+    pick=$(printf '%s' "$menu" | sort -k1.3 | rofi -dmenu -i -no-custom -p " Theme" \
+        -display-columns 1 -display-column-separator $'\t' -theme ~/.config/rofi/menu.rasi) || exit 0
+    set -- "${pick##*$'\t'}"
+fi
+
+id=$1
+meta=$GEN/$id/meta
+[ -f "$meta" ] || { notify-send -a Theme "Unknown theme: $id"; exit 1; }
+get() { sed -n "s/^$1=//p" "$meta"; }
+
+plasma-apply-colorscheme "$(get scheme)" >/dev/null
+/usr/libexec/plasma-changeicons "$(get icons)" >/dev/null 2>&1
+qdbus-qt6 org.kde.kded6 /modules/gtkconfig org.kde.GtkConfig.setGtkTheme "$(get gtk)" >/dev/null
+cp "$GEN/$id/alacritty.toml" ~/.config/alacritty/theme.toml
+# colors.rasi is untracked runtime state, so the per-theme icon set goes there
+# too (it is @imported after config.rasi's own configuration block).
+{ cat "$GEN/$id/colors.rasi"; printf 'configuration { icon-theme: "%s"; }\n' "$(get icons)"; } \
+    > ~/.config/rofi/colors.rasi
+kwriteconfig6 --file ~/.local/share/konsole/Desk.profile --group Appearance --key ColorScheme "$(get konsole)"
+echo "$id" > "$DESK/current"
+notify-send -a Theme -i preferences-desktop-theme "Theme: $(get name)" \
+    "Open Konsole windows pick it up when reopened; Alacritty updates live."

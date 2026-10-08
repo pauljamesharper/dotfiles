@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# desk-wallpaper: wallpaper picker with thumbnails (Super+Shift+W).
+# Lists every image under ~/.local/share/wallpapers, plus the Giants slideshow.
+set -u
+pkill -x rofi && exit 0
+WALLS=~/.local/share/wallpapers
+THUMBS=~/.cache/desk/thumbs
+SLIDESHOW_DIR=$WALLS/Giants
+mkdir -p "$THUMBS"
+
+entries=$(find -L "$WALLS" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) | sort -V)
+list=""
+while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    thumb=$THUMBS/$(printf '%s' "$f" | md5sum | cut -c1-16).jpg
+    [ "$thumb" -nt "$f" ] || magick "$f[0]" -thumbnail 400x225^ -gravity center -extent 400x225 "$thumb" 2>/dev/null
+    label=$(basename "${f%.*}" | sed 's/^[0-9]*-//; s/[-_]/ /g; s/\b\(.\)/\u\1/g')
+    list+="$label\0icon\x1f$thumb\x1finfo\x1f$f\n"
+done <<< "$entries"
+
+slide_thumb=$THUMBS/slideshow.jpg
+[ -f "$slide_thumb" ] || magick "$(printf '%s\n' "$entries" | grep -m1 "$SLIDESHOW_DIR")" -thumbnail 400x225^ \
+    -gravity center -extent 400x225 -fill '#0008' -draw 'rectangle 0,170 400,225' "$slide_thumb" 2>/dev/null
+
+pick=$(printf "Giants slideshow\0icon\x1f$slide_thumb\x1finfo\x1fslideshow\n$list" |
+    rofi -dmenu -i -no-custom -p "󰸉 Wallpaper" -show-icons -format i -theme ~/.config/rofi/wall.rasi) || exit 0
+
+if [ "$pick" = 0 ]; then
+    qdbus-qt6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+    desktops().forEach(function (d) {
+        d.wallpaperPlugin = 'org.kde.slideshow';
+        d.currentConfigGroup = ['Wallpaper', 'org.kde.slideshow', 'General'];
+        d.writeConfig('SlidePaths', '$SLIDESHOW_DIR');
+    });" >/dev/null
+else
+    file=$(printf '%s\n' "$entries" | sed -n "${pick}p")
+    plasma-apply-wallpaperimage "$file" >/dev/null
+fi

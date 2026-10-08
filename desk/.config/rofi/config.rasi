@@ -1,0 +1,68 @@
+/* desk: rofi launcher. Colours come from colors.rasi, rewritten by desk-theme. */
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    font: "JetBrainsMono Nerd Font 12";
+    display-drun: " Apps";
+    display-run: " Run";
+    display-window: " Windows";
+    drun-display-format: "{name}";
+    matching: "fuzzy";
+    sort: true;
+    sorting-method: "fzf";
+    hover-select: true;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+}
+
+@import "colors.rasi"
+
+* {
+    background-color: transparent;
+    text-color: @fg;
+}
+
+window {
+    width: 38%;
+    location: center;
+    anchor: center;
+    background-color: @bg;
+    border: 2px;
+    border-color: @border;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing: 12px;
+}
+
+inputbar {
+    children: [ prompt, entry ];
+    background-color: @bg-alt;
+    border-radius: 6px;
+    padding: 8px 12px;
+    spacing: 10px;
+}
+
+prompt { text-color: @primary; }
+entry { placeholder: "Search…"; placeholder-color: @fg-dim; }
+
+listview {
+    lines: 10;
+    columns: 1;
+    fixed-height: true;
+    scrollbar: false;
+    spacing: 4px;
+}
+
+element {
+    padding: 6px 10px;
+    border-radius: 6px;
+    spacing: 10px;
+}
+element normal.normal, element alternate.normal { background-color: transparent; text-color: @fg; }
+element selected.normal { background-color: @primary; text-color: @on-primary; }
+element-icon { size: 22px; background-color: inherit; }
+element-text { background-color: inherit; text-color: inherit; vertical-align: 0.5; }

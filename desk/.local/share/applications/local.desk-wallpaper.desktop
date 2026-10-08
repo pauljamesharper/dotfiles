@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Wallpaper Picker
+Exec=/var/home/pharper/.local/bin/desk-wallpaper
+Icon=preferences-desktop-wallpaper
+NoDisplay=true

@@ -50,6 +50,7 @@ brew bundle --global              # install the Homebrew packages in ~/.Brewfile
 | `alacritty` | `.config/alacritty/alacritty.toml` | Alacritty terminal. Colours come from `theme.toml`, which is generated, not tracked |
 | `bash` | `.bashrc`, `.bash_profile` | Shell startup: mise activation, Universal Blue's bling, and aliases (`e` for `emacsclient -nw`, `fastfetch` using the config below) |
 | `atuin` | `.config/atuin/config.toml` | Shell history search |
+| `desk` | `.config/desk/themes/`, `.config/rofi/`, `.local/bin/desk-*`, Giants colours, icons and wallpapers | Switchable desktop themes and a wallpaper picker. See [Themes and wallpapers](#themes-and-wallpapers) |
 | `emacs` | `.config/emacs/`, `.config/autostart/emacs-daemon.desktop`, `.local/bin/emacs-launch`, `.local/bin/soffice`, `emacsclient.desktop` | Emacs Writing Studio config with personal modules, the daemon autostart, a client launcher, and a LibreOffice shim. See [Emacs](#emacs) |
 | `environment` | `.config/environment.d/intel-gtk-fix.conf` | Session environment: `GSK_RENDERER=gl` for GTK 4 on Intel graphics |
 | `homebrew` | `.Brewfile` | Homebrew packages (aria2, atuin, bat, eza, ripgrep, starship, stow, zoxide…) for `brew bundle --global` |
@@ -133,6 +134,66 @@ set up by hand.
   apart, then a cheat-sheet widget, the system tray and show desktop.
 - **Second screen's panel:** desktop numbers only, sized to fit them.
 
+### Themes and wallpapers
+
+The `desk` package, carried over from the earlier Aurora setup on Codeberg,
+gives the whole desktop one switchable colour theme. There are 13: Giants
+(the default, after Omarchy's Giants), Catppuccin, Doom One, Dracula,
+Everforest, GitHub Dark, Gruvbox, Kanagawa, Monokai, Moonfly, Nord, Retro and
+Rosé Pine Moon.
+
+- **`desk-theme`** (Meta+Shift+T) shows a picker, or takes a theme id:
+  `desk-theme nord`. It sets the KDE colour scheme, icons and GTK theme, and
+  recolours Konsole (the `Desk` profile), Alacritty and rofi.
+- **`desk-wallpaper`** (Meta+Shift+W) shows thumbnails of everything in
+  `~/.local/share/wallpapers`, plus a slideshow of the 19 Giants wallpapers
+  (credits in `Giants/CREDITS.md`).
+- **`desk-gen`** builds the KDE, Konsole, Alacritty and rofi colours from each
+  theme's `theme.conf` and `foot-colors.ini`. Run it after adding or editing
+  a theme in `desk/.config/desk/themes/<id>/`. Its output in
+  `~/.config/desk/generated` isn't tracked.
+
+One-off setup on a new machine:
+
+```bash
+desk-gen
+# rofi for the pickers, and Yaru icons for the Giants icon theme, from the emacs box
+distrobox enter emacs -- sudo dnf install rofi yaru-icon-theme
+distrobox enter emacs -- distrobox-export --bin /usr/bin/rofi --export-path ~/.local/bin
+distrobox enter emacs -- cp -a /usr/share/icons/{Yaru,Yaru-dark,Yaru-wartybrown} ~/.local/share/icons/
+# a Konsole profile for the themes to colour, as the default
+cp ~/.local/share/konsole/Default.profile ~/.local/share/konsole/Desk.profile   # then set Name=Desk
+kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile Desk.profile
+```
+
+The other themes use [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)
+icons and [Orchis](https://github.com/vinceliuice/Orchis-theme) GTK themes.
+Without them those themes still recolour everything, but icons and GTK apps
+fall back to Breeze:
+
+```bash
+git clone --depth 1 https://github.com/vinceliuice/Colloid-icon-theme /tmp/colloid
+cd /tmp/colloid
+./install.sh -d ~/.local/share/icons -s default nord dracula gruvbox everforest catppuccin -t default
+./install.sh -d ~/.local/share/icons -s default -t orange
+./install.sh -d ~/.local/share/icons -s dracula -t grey
+
+# Orchis needs sassc, so build it in a throwaway container
+git clone --depth 1 https://github.com/vinceliuice/Orchis-theme /tmp/orchis
+mkdir -p /tmp/orchis-out ~/.themes
+podman run --rm -v /tmp/orchis:/src:Z -v /tmp/orchis-out:/out:Z registry.fedoraproject.org/fedora:latest bash -c '
+  dnf -y -q install sassc which findutils && cd /src &&
+  ./install.sh -d /out -c dark -t default purple green grey orange pink &&
+  ./install.sh -d /out -c dark -t default --tweaks nord &&
+  ./install.sh -d /out -c dark -t purple --tweaks dracula'
+cp -a /tmp/orchis-out/. ~/.themes/
+```
+
+The pickers' shortcuts go in KDE's shortcut file. Write them while you're
+logged out, or from a script in `~/.config/plasma-workspace/env/`, which runs
+before KWin starts. Setting shortcuts over KDE's D-Bus shortcut service has
+crashed KWin before.
+
 ### Keyboard shortcuts
 
 Meta is the Windows/Super key.
@@ -144,6 +205,8 @@ Meta is the Windows/Super key.
 | Meta+E | Emacs, a new frame on the daemon |
 | Meta+B | Brave |
 | Meta+F | Dolphin |
+| Meta+Shift+T | Theme picker |
+| Meta+Shift+W | Wallpaper picker |
 | Meta+Space | KRunner |
 | Meta+Q | Close window |
 | Meta+W | Overview |
@@ -256,6 +319,8 @@ Some packages call programs that aren't in the image or this repo:
 - `emacs-launch` and `emacs-daemon.desktop` need the `emacs` distrobox.
 - `soffice` needs the LibreOffice Flatpak (`org.libreoffice.LibreOffice`).
 - `alacritty.toml` imports `theme.toml`, written by `desk-theme`.
+- `desk-theme` and `desk-wallpaper` need rofi (exported from the `emacs`
+  box) and ImageMagick's `magick`, which Aurora includes.
 - Alacritty itself.
 
 ## Keeping in sync

@@ -1,0 +1,5 @@
+/* desk: small dmenu-style menus (exit menu, theme picker) */
+@import "config.rasi"
+configuration { show-icons: false; }
+window { width: 22%; }
+listview { lines: 8; }

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Theme Picker
+Exec=/var/home/pharper/.local/bin/desk-theme
+Icon=preferences-desktop-theme
+NoDisplay=true

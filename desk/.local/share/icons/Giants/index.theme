@@ -1,0 +1,14 @@
+[Icon Theme]
+Name=Giants
+Comment=Yaru warty brown with Breeze Dark symbolic icons, for the Giants theme
+Inherits=Yaru-wartybrown,Yaru-dark,Yaru,breeze-dark,hicolor
+Example=folder
+FollowsColorScheme=true
+Directories=scalable/apps
+
+[scalable/apps]
+Size=48
+MinSize=8
+MaxSize=512
+Type=Scalable
+Context=Applications
