@@ -35,3 +35,6 @@ alias fastfetch='/usr/bin/fastfetch --color $(/usr/libexec/bazzite-bling-fastfet
 
 # Emacs in the terminal, through the running daemon
 alias e='emacsclient -nw'
+### bling.sh source start
+test -f /usr/share/ublue-os/bling/bling.sh && source /usr/share/ublue-os/bling/bling.sh
+### bling.sh source end
