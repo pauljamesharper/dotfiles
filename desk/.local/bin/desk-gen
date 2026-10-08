@@ -83,15 +83,18 @@ def build(tid):
     sel_bg = hexc(term.get("selection-background", mix(tbg, tfg, 0.25)))
     sel_fg = hexc(term.get("selection-foreground", tfg))
 
-    view = mix(bg, black, 0.2)
-    deep = mix(bg, black, 0.4)
+    light = lum(bg) > 0.4
+    # Views and panels sit darker than the window on dark themes and lighter
+    # (with only slightly darker tooltips) on light ones.
+    view = mix(bg, "#ffffff", 0.5) if light else mix(bg, black, 0.2)
+    deep = mix(bg, black, 0.08) if light else mix(bg, black, 0.4)
     inactive = mix(fg, bg, 0.45)
     on_primary = readable_on(primary, deep, "#ffffff", fg)
     out = OUT / tid
     out.mkdir(parents=True, exist_ok=True)
 
     # --- KDE colour scheme (Giants keeps its hand-made scheme) ---
-    scheme = conf.get("kde") or f"Desk{name.replace(' ', '').replace('é', 'e')}"
+    scheme = conf.get("kde") or "Desk" + re.sub(r"[^A-Za-z0-9]", "", name.replace("é", "e"))
     if not conf.get("kde"):
         def group(bgn, bga, sel=False):
             f = on_primary if sel else fg
@@ -153,7 +156,8 @@ def build(tid):
     (out / "colors.rasi").write_text("\n".join(r) + "\n")
 
     meta = {"name": name, "scheme": scheme, "gtk": conf.get("gtk", "Breeze"),
-            "icons": conf.get("icons", "breeze-dark"), "konsole": f"desk-{tid}"}
+            "icons": conf.get("icons", "breeze-dark"), "konsole": f"desk-{tid}",
+            "mode": "light" if light else "dark"}
     (out / "meta").write_text("".join(f"{k}={v}\n" for k, v in meta.items()))
     return name, scheme, contrast(primary, on_primary)
 
@@ -162,4 +166,4 @@ if __name__ == "__main__":
     for tid in sorted(os.listdir(THEMES)):
         if (THEMES / tid / "theme.conf").exists():
             name, scheme, c = build(tid)
-            print(f"{tid:12} {name:12} {scheme:18} highlight contrast {c:.1f}")
+            print(f"{tid:26} {name:28} {scheme:30} highlight contrast {c:.1f}")

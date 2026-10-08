@@ -149,6 +149,12 @@ Rosé Pine Moon.
 - **`desk-wallpaper`** (Meta+Shift+W) shows thumbnails of everything in
   `~/.local/share/wallpapers`, plus a slideshow of the 19 Giants wallpapers
   (credits in `Giants/CREDITS.md`).
+- **`desk-omarchy`** imports [Omarchy](https://github.com/omacom/omarchy)'s
+  22 themes as `omarchy-<id>` ("Nord (Omarchy)" etc. in the picker) and its
+  ~90 wallpapers into `~/.local/share/wallpapers/Omarchy`, then runs
+  `desk-gen`. Rerun it to pick up Omarchy's changes. It keeps a sparse
+  checkout in `~/.cache/desk/omarchy`; nothing it writes is tracked. The
+  themes use Omarchy's Yaru accent icons, falling back to Breeze.
 - **`desk-gen`** builds the KDE, Konsole, Alacritty and rofi colours from each
   theme's `theme.conf` and `foot-colors.ini`. Run it after adding or editing
   a theme in `desk/.config/desk/themes/<id>/`. Its output in
@@ -161,7 +167,9 @@ desk-gen
 # rofi for the pickers, and Yaru icons for the Giants icon theme, from the emacs box
 distrobox enter emacs -- sudo dnf install rofi yaru-icon-theme
 distrobox enter emacs -- distrobox-export --bin /usr/bin/rofi --export-path ~/.local/bin
-distrobox enter emacs -- cp -a /usr/share/icons/{Yaru,Yaru-dark,Yaru-wartybrown} ~/.local/share/icons/
+# Yaru and its accent colours, which the Omarchy themes use
+distrobox enter emacs -- cp -a /usr/share/icons/Yaru* ~/.local/share/icons/
+desk-omarchy
 # a Konsole profile for the themes to colour, as the default
 cp ~/.local/share/konsole/Default.profile ~/.local/share/konsole/Desk.profile   # then set Name=Desk
 kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile Desk.profile

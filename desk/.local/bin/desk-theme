@@ -23,14 +23,19 @@ id=$1
 meta=$GEN/$id/meta
 [ -f "$meta" ] || { notify-send -a Theme "Unknown theme: $id"; exit 1; }
 get() { sed -n "s/^$1=//p" "$meta"; }
+icons=$(get icons)
+# Fall back to Breeze when the theme's icon set isn't installed
+found=
+for d in ~/.local/share/icons ~/.icons /usr/share/icons; do [ -f "$d/$icons/index.theme" ] && found=1; done
+[ -n "$found" ] || { icons=breeze; [ "$(get mode)" = light ] || icons=breeze-dark; }
 
 plasma-apply-colorscheme "$(get scheme)" >/dev/null
-/usr/libexec/plasma-changeicons "$(get icons)" >/dev/null 2>&1
+/usr/libexec/plasma-changeicons "$icons" >/dev/null 2>&1
 qdbus-qt6 org.kde.kded6 /modules/gtkconfig org.kde.GtkConfig.setGtkTheme "$(get gtk)" >/dev/null
 cp "$GEN/$id/alacritty.toml" ~/.config/alacritty/theme.toml
 # colors.rasi is untracked runtime state, so the per-theme icon set goes there
 # too (it is @imported after config.rasi's own configuration block).
-{ cat "$GEN/$id/colors.rasi"; printf 'configuration { icon-theme: "%s"; }\n' "$(get icons)"; } \
+{ cat "$GEN/$id/colors.rasi"; printf 'configuration { icon-theme: "%s"; }\n' "$icons"; } \
     > ~/.config/rofi/colors.rasi
 kwriteconfig6 --file ~/.local/share/konsole/Desk.profile --group Appearance --key ColorScheme "$(get konsole)"
 echo "$id" > "$DESK/current"
