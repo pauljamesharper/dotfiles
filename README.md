@@ -50,7 +50,7 @@ brew bundle --global              # install the Homebrew packages in ~/.Brewfile
 | `emacs` | `.config/emacs/`, `.config/autostart/emacs-daemon.desktop`, `.local/bin/emacs-launch`, `.local/bin/soffice`, `emacsclient.desktop` | Emacs Writing Studio config with personal modules, the daemon autostart, a client launcher, and a LibreOffice shim. See [Emacs](#emacs) |
 | `environment` | `.config/environment.d/intel-gtk-fix.conf` | Session environment: `GSK_RENDERER=gl` for GTK 4 on Intel graphics |
 | `homebrew` | `.Brewfile` | Homebrew packages (aria2, atuin, bat, eza, ripgrep, starship, stow, zoxide…) for `brew bundle --global` |
-| `fastfetch` | `.config/fastfetch/config.jsonc` | Bazzite's fastfetch layout plus a line counting mise tools and pipx-style apps, which fastfetch can't detect itself |
+| `fastfetch` | `.config/fastfetch/config.jsonc` | Aurora's fastfetch layout plus a line counting mise tools and pipx-style apps, which fastfetch can't detect itself |
 | `gh` | `.config/gh/config.yml` | GitHub CLI settings (git over SSH) |
 | `glow` | `.config/glow/glow.yml` | Markdown viewer |
 | `khal` | `.config/khal/config` | Calendar (Google and EteSync), reading what vdirsyncer syncs |
@@ -257,6 +257,6 @@ Some packages call programs that aren't in the image or this repo:
 
 ## Keeping in sync
 
-- The `fastfetch` package is a copy of Bazzite's config
-  (`/usr/share/ublue-os/bazzite/fastfetch.jsonc`). If Bazzite changes its
-  layout, copy it again and re-add the mise line.
+- The `fastfetch` package is a copy of Aurora's config
+  (`/usr/share/ublue-os/fastfetch.jsonc`). If Aurora changes its layout,
+  copy it again and re-add the mise line.

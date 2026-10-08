@@ -29,9 +29,9 @@ test -f /usr/share/bazzite-cli/bling.sh && source /usr/share/bazzite-cli/bling.s
 ### bling.sh source end
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 
-# fastfetch: Bazzite's profile.d alias forces its own config; use
-# ~/.config/fastfetch/config.jsonc (from dotfiles) with Bazzite's colours
-alias fastfetch='/usr/bin/fastfetch --color $(/usr/libexec/bazzite-bling-fastfetch) -c ~/.config/fastfetch/config.jsonc'
+# fastfetch: Aurora's profile.d alias forces its own config; use
+# ~/.config/fastfetch/config.jsonc (from dotfiles) instead
+alias fastfetch='/usr/bin/fastfetch -c ~/.config/fastfetch/config.jsonc'
 
 # Emacs in the terminal, through the running daemon
 alias e='emacsclient -nw'
