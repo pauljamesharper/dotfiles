@@ -1,5 +1,5 @@
 # Homebrew packages: install with `brew bundle --global`.
-# Flatpaks are installed by `ujust mango-apps`; stow comes with the image.
+# GUI apps are Flatpaks, installed separately.
 
 # Download with resuming and segmented downloading
 brew "aria2"
@@ -31,6 +31,8 @@ brew "ripgrep"
 brew "shellcheck"
 # Cross-shell prompt for astronauts
 brew "starship"
+# Organize software neatly under a single directory tree (e.g. /usr/local)
+brew "stow"
 # Stress test a computer system in various selectable ways
 brew "stress-ng"
 # Very fast implementation of tldr in Rust
