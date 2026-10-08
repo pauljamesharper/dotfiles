@@ -20,6 +20,12 @@ ollama = "latest"
 # goes into beancount's venv
 "pypi:beancount" = { version = "latest", uvx_args = "--with beangulp" }
 "pypi:fava" = "latest"
+node = "24"
+"npm:@deepseek-ai/dsh" = "0.2.0-rc.2"
+"npm:pyright" = "latest"
+ruff = "latest"
+shfmt = "latest"
+shellcheck = "latest"
 
 [tasks.ollama-models]
 description = "Pull the Ollama models (needs ollama.service running)"
