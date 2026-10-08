@@ -1,0 +1,11 @@
+[Unit]
+Description=Upgrade mise and the tools in its global config
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# The shims give the npm and pypi backends the node and uv they build with
+Environment=PATH=%h/.local/share/mise/shims:%h/.local/bin:/home/linuxbrew/.linuxbrew/bin:/usr/bin:/bin
+ExecStart=-%h/.local/bin/mise self-update --yes
+ExecStart=%h/.local/bin/mise upgrade

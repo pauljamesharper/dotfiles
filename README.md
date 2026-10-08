@@ -48,6 +48,7 @@ brew bundle --global              # install the Homebrew packages in ~/.Brewfile
 | Package | Links into `~` | What it's for |
 |---|---|---|
 | `alacritty` | `.config/alacritty/alacritty.toml` | Alacritty terminal. Colours come from `theme.toml`, which is generated, not tracked |
+| `autoupdate` | `.config/systemd/user/{mise,distrobox}-upgrade.{service,timer}` | Daily upgrades that Aurora's `uupd` leaves out: mise and its tools, and the packages in every distrobox |
 | `bash` | `.bashrc`, `.bash_profile` | Shell startup: mise activation, Universal Blue's bling, and aliases (`e` for `emacsclient -nw`, `fastfetch` using the config below) |
 | `atuin` | `.config/atuin/config.toml` | Shell history search |
 | `desk` | `.config/desk/themes/`, `.config/rofi/`, `.local/bin/desk-*`, Giants colours, icons and wallpapers | Switchable desktop themes and a wallpaper picker. See [Themes and wallpapers](#themes-and-wallpapers) |
@@ -246,6 +247,10 @@ distrobox enter emacs -- emacs --daemon
 systemctl --user daemon-reload
 systemctl --user enable --now ollama.service
 mise run ollama-models
+
+# Daily mise and distrobox upgrades
+systemctl --user daemon-reload
+systemctl --user enable --now mise-upgrade.timer distrobox-upgrade.timer
 
 # Calendars and contacts: authorise Google, then sync
 vdirsyncer discover
