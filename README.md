@@ -9,6 +9,9 @@ as it should appear there. Stow symlinks each file into place, so editing
 `~/.config/khal/config` edits the file in this repo, and `git diff` shows what
 changed.
 
+Branches: `aurora` (the default) is this setup. `bazzite` keeps the earlier
+Bazzite DX + Mango version.
+
 ## Why Aurora
 
 [Aurora](https://docs.getaurora.dev) is Universal Blue's KDE Plasma desktop,
