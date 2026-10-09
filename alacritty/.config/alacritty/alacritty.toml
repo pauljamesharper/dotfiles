@@ -18,6 +18,8 @@ history = 10000
 [selection]
 save_to_clipboard = true
 
+# Alacritty runs in the emacs distrobox (no host package), so hop out to a
+# shell on the host; run directly on a host, it just starts bash.
 [terminal.shell]
-program = "/usr/bin/bash"
-args = ["-l"]
+program = "/bin/sh"
+args = ["-c", "if [ -e /run/.containerenv ]; then exec distrobox-host-exec bash -l; else exec bash -l; fi"]

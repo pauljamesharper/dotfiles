@@ -203,7 +203,26 @@ cp -a /tmp/orchis-out/. ~/.themes/
 The pickers' shortcuts go in KDE's shortcut file. Write them while you're
 logged out, or from a script in `~/.config/plasma-workspace/env/`, which runs
 before KWin starts. Setting shortcuts over KDE's D-Bus shortcut service has
-crashed KWin before.
+crashed KWin before (though moving Meta+Return to Alacritty with
+`setForeignShortcutKeys` went fine).
+
+### Alacritty
+
+Alacritty is the default terminal, but neither Homebrew (macOS only) nor
+Flathub has it, so it lives in the `emacs` box. Its config starts the shell on
+the host through `distrobox-host-exec`, so shells, mise and brew are the
+host's, not the box's.
+
+```bash
+distrobox enter emacs -- sudo dnf install alacritty
+distrobox enter emacs -- distrobox-export --app /usr/share/applications/Alacritty.desktop
+kwriteconfig6 --file kdeglobals --group General --key TerminalApplication "/usr/bin/distrobox-enter -n emacs -- alacritty"
+kwriteconfig6 --file kdeglobals --group General --key TerminalService emacs-Alacritty.desktop
+```
+
+Then set Meta+Return on Alacritty in System Settings → Shortcuts, and point
+`tmux-terminal.desktop` at
+`distrobox-enter -n emacs -- alacritty -e distrobox-host-exec /usr/bin/tmux`.
 
 ### Keyboard shortcuts
 
@@ -211,8 +230,8 @@ Meta is the Windows/Super key.
 
 | Keys | Action |
 |---|---|
-| Meta+Return | Konsole |
-| Meta+Shift+Return | Konsole running tmux (`tmux-terminal.desktop`) |
+| Meta+Return | Alacritty |
+| Meta+Shift+Return | Alacritty running tmux (`tmux-terminal.desktop`) |
 | Meta+E | Emacs, a new frame on the daemon |
 | Meta+B | Brave |
 | Meta+F | Dolphin |
