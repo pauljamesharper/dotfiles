@@ -63,6 +63,7 @@ brew bundle --global              # install the Homebrew packages in ~/.Brewfile
 | `mise` | `.config/mise/config.toml` | Global tool list: Claude Code, opencode, Ollama, Python, uv, Node, vdirsyncer, khal, khard, todoman, beancount + beangulp, fava, and Emacs's helpers (pyright, ruff, shfmt, shellcheck) |
 | `ollama` | `.config/systemd/user/ollama.service` | Runs `ollama serve` as a user service |
 | `opencode` | `.config/opencode/opencode.jsonc` | opencode settings |
+| `plasmoids` | `.local/share/plasma/plasmoids/local.*` | Home-made panel widgets: numbered desktops, Open-Meteo weather, caffeine and a shortcut cheat sheet. See [Desktop](#desktop-kde-plasma-and-krohnkite) |
 | `starship` | `.config/starship.toml` | Shell prompt |
 | `vdirsyncer` | `.config/vdirsyncer/config` | Syncs calendars and contacts between Google, EteSync and local folders |
 | `vscode` | `.config/Code/User/settings.json` | VS Code editor settings |
@@ -133,7 +134,21 @@ set up by hand.
 - **Main panel:** app launcher, desktop numbers, then (centred between two
   spacers) the Fokus pomodoro timer, clock, weather and caffeine, each 12 px
   apart, then a cheat-sheet widget, the system tray and show desktop.
-- **Second screen's panel:** desktop numbers only, sized to fit them.
+- **Second screen's panel:** the same widgets.
+- **Widgets:** desktop numbers, weather, caffeine and the cheat sheet are
+  the `plasmoids` package; Fokus comes from the KDE Store (Add Widgets → Get
+  New Widgets). Clicking a desktop number switches to it through KWin's D-Bus
+  `setCurrentDesktop`, since Plasma 6.7 doesn't let widgets call
+  `VirtualDesktopInfo.requestActivate`. The weather widget defaults to
+  Greenwich; set your place per widget, live:
+
+  ```bash
+  qdbus-qt6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript '
+  panels().forEach(function (p) { p.widgets("local.weather").forEach(function (w) {
+    w.currentConfigGroup = ["General"];
+    w.writeConfig("placeName", "Town"); w.writeConfig("latitude", 0.0); w.writeConfig("longitude", 0.0);
+  }); });'
+  ```
 
 ### Themes and wallpapers
 

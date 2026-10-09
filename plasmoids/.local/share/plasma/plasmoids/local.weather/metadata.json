@@ -1,0 +1,13 @@
+{
+  "KPlugin": {
+    "Id": "local.weather",
+    "Name": "Weather (Open-Meteo)",
+    "Description": "Current weather from Open-Meteo for a fixed location",
+    "Icon": "weather-clear",
+    "Category": "Environment and Weather",
+    "License": "GPL-2.0+",
+    "Version": "1.0"
+  },
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

@@ -1,0 +1,13 @@
+{
+  "KPlugin": {
+    "Id": "local.numbereddesktops",
+    "Name": "Numbered Desktops",
+    "Description": "Compact numbered virtual desktop switcher",
+    "Icon": "virtual-desktops",
+    "Category": "Windows and Tasks",
+    "License": "GPL-2.0+",
+    "Version": "1.0"
+  },
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

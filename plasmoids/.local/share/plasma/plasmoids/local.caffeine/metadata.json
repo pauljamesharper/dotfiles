@@ -1,0 +1,13 @@
+{
+  "KPlugin": {
+    "Id": "local.caffeine",
+    "Name": "Caffeine",
+    "Description": "Keep the screen awake and block sleep",
+    "Icon": "system-suspend-inhibited",
+    "Category": "System Information",
+    "License": "GPL-2.0+",
+    "Version": "1.0"
+  },
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-API-Minimum-Version": "6.0"
+}

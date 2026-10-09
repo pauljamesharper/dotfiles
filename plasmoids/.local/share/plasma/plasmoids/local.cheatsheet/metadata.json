@@ -1,0 +1,13 @@
+{
+  "KPlugin": {
+    "Id": "local.cheatsheet",
+    "Name": "Shortcut Cheat Sheet",
+    "Description": "Popup list of keyboard shortcuts",
+    "Icon": "input-keyboard",
+    "Category": "Utilities",
+    "License": "GPL-2.0+",
+    "Version": "1.0"
+  },
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-API-Minimum-Version": "6.0"
+}
