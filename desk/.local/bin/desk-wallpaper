@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
-# desk-wallpaper: wallpaper picker with thumbnails (Super+Shift+W).
+# desk-wallpaper [file|slideshow]: wallpaper picker with thumbnails (Super+Shift+W).
 # Lists every image under ~/.local/share/wallpapers, plus the Giants slideshow.
+# With an argument, sets that wallpaper directly (desk-theme does this).
 set -u
-pkill -x rofi && exit 0
 WALLS=~/.local/share/wallpapers
 THUMBS=~/.cache/desk/thumbs
 SLIDESHOW_DIR=$WALLS/Giants
+
+apply() {
+    if [ "$1" = slideshow ]; then
+        qdbus-qt6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+        desktops().forEach(function (d) {
+            d.wallpaperPlugin = 'org.kde.slideshow';
+            d.currentConfigGroup = ['Wallpaper', 'org.kde.slideshow', 'General'];
+            d.writeConfig('SlidePaths', '$SLIDESHOW_DIR');
+        });" >/dev/null
+    else
+        plasma-apply-wallpaperimage "$1" >/dev/null
+    fi
+}
+
+[ $# -gt 0 ] && { apply "$1"; exit; }
+pkill -x rofi && exit 0
 mkdir -p "$THUMBS"
 
 entries=$(find -L "$WALLS" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) | sort -V)
@@ -26,13 +42,7 @@ pick=$(printf "Giants slideshow\0icon\x1f$slide_thumb\x1finfo\x1fslideshow\n$lis
     rofi -dmenu -i -no-custom -p "󰸉 Wallpaper" -show-icons -format i -theme ~/.config/rofi/wall.rasi) || exit 0
 
 if [ "$pick" = 0 ]; then
-    qdbus-qt6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
-    desktops().forEach(function (d) {
-        d.wallpaperPlugin = 'org.kde.slideshow';
-        d.currentConfigGroup = ['Wallpaper', 'org.kde.slideshow', 'General'];
-        d.writeConfig('SlidePaths', '$SLIDESHOW_DIR');
-    });" >/dev/null
+    apply slideshow
 else
-    file=$(printf '%s\n' "$entries" | sed -n "${pick}p")
-    plasma-apply-wallpaperimage "$file" >/dev/null
+    apply "$(printf '%s\n' "$entries" | sed -n "${pick}p")"
 fi

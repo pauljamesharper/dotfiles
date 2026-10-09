@@ -8,6 +8,7 @@ scheme folders, where desk-theme picks it up.
 """
 import os
 import re
+import shutil
 from pathlib import Path
 
 HOME = Path.home()
@@ -15,6 +16,7 @@ THEMES = HOME / ".config/desk/themes"
 OUT = HOME / ".config/desk/generated"
 KDE_SCHEMES = HOME / ".local/share/color-schemes"
 KONSOLE = HOME / ".local/share/konsole"
+WALLS = HOME / ".local/share/wallpapers"
 
 
 def read_kv(path):
@@ -155,15 +157,32 @@ def build(tid):
          f"    secondary: {secondary};", f"    border: {primary};", "}"]
     (out / "colors.rasi").write_text("\n".join(r) + "\n")
 
+    # wallpaper: "slideshow", a path, or a file name somewhere under WALLS
+    wall = conf.get("wallpaper", "")
+    if wall and wall != "slideshow" and not Path(wall).is_file():
+        wall = next((str(f) for f in WALLS.rglob(wall)), "")
     meta = {"name": name, "scheme": scheme, "gtk": conf.get("gtk", "Breeze"),
             "icons": conf.get("icons", "breeze-dark"), "konsole": f"desk-{tid}",
-            "mode": "light" if light else "dark"}
+            "mode": "light" if light else "dark", "wallpaper": wall}
     (out / "meta").write_text("".join(f"{k}={v}\n" for k, v in meta.items()))
     return name, scheme, contrast(primary, on_primary)
 
 
 if __name__ == "__main__":
+    tids, schemes = [], []
     for tid in sorted(os.listdir(THEMES)):
         if (THEMES / tid / "theme.conf").exists():
             name, scheme, c = build(tid)
+            tids.append(tid)
+            schemes.append(scheme)
             print(f"{tid:26} {name:28} {scheme:30} highlight contrast {c:.1f}")
+    # Remove output left behind by deleted or renamed themes
+    for d in OUT.iterdir():
+        if d.name not in tids:
+            shutil.rmtree(d)
+    for f in KONSOLE.glob("desk-*.colorscheme"):
+        if f.stem.removeprefix("desk-") not in tids:
+            f.unlink()
+    for f in KDE_SCHEMES.glob("Desk*.colors"):
+        if f.stem not in schemes and not f.is_symlink():
+            f.unlink()

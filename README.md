@@ -145,13 +145,16 @@ Rosé Pine Moon.
 
 - **`desk-theme`** (Meta+Shift+T) shows a picker, or takes a theme id:
   `desk-theme nord`. It sets the KDE colour scheme, icons and GTK theme, and
-  recolours Konsole (the `Desk` profile), Alacritty and rofi.
+  recolours Konsole (the `Desk` profile), Alacritty and rofi. A theme with a
+  `wallpaper` in its `theme.conf` (a path, a file name under
+  `~/.local/share/wallpapers`, or `slideshow`) switches the wallpaper too.
 - **`desk-wallpaper`** (Meta+Shift+W) shows thumbnails of everything in
   `~/.local/share/wallpapers`, plus a slideshow of the 19 Giants wallpapers
   (credits in `Giants/CREDITS.md`).
 - **`desk-omarchy`** imports [Omarchy](https://github.com/omacom/omarchy)'s
-  22 themes as `omarchy-<id>` ("Nord (Omarchy)" etc. in the picker) and its
-  ~90 wallpapers into `~/.local/share/wallpapers/Omarchy`, then runs
+  22 themes as `omarchy-<id>` and their wallpapers into
+  `~/.local/share/wallpapers/Omarchy` (minus Omarchy's logo wallpapers and
+  duplicates), with each theme's first wallpaper as its default, then runs
   `desk-gen`. Rerun it to pick up Omarchy's changes. It keeps a sparse
   checkout in `~/.cache/desk/omarchy`; nothing it writes is tracked. The
   themes use Omarchy's Yaru accent icons, falling back to Breeze.

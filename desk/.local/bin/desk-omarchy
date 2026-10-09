@@ -4,9 +4,11 @@
 Keeps a sparse checkout of Omarchy's themes/ in ~/.cache/desk/omarchy, turns
 each themes/<id>/colors.toml into ~/.config/desk/themes/omarchy-<id>/ (the
 theme.conf + foot-colors.ini pair desk-gen reads), copies its backgrounds to
-~/.local/share/wallpapers/Omarchy/<id>-<name>, then runs desk-gen.
+~/.local/share/wallpapers/Omarchy/<id>-<name> and makes the first one the
+theme's wallpaper, then runs desk-gen.
 None of this is tracked in the dotfiles; it is all fetched.
 """
+import hashlib
 import shutil
 import subprocess
 import tomllib
@@ -16,8 +18,10 @@ HOME = Path.home()
 REPO_URL = "https://github.com/omacom/omarchy"
 REPO = HOME / ".cache/desk/omarchy"
 THEMES = HOME / ".config/desk/themes"
-GEN = HOME / ".config/desk/generated"
 WALLS = HOME / ".local/share/wallpapers/Omarchy"
+# Omarchy's rose-pine is the light Dawn variant; Rose Pine Moon is a desk theme
+NAMES = {"rose-pine": "Rose Pine Dawn"}
+seen = {}  # wallpaper md5 -> where it was copied
 ICON_DIRS = [HOME / ".local/share/icons", HOME / ".icons", Path("/usr/share/icons")]
 SPARSE = ["/themes/*/colors.toml", "/themes/*/icons.theme", "/themes/*/backgrounds/*",
           "!/themes/*/backgrounds/intros/"]
@@ -35,7 +39,7 @@ def sync_repo():
         git("sparse-checkout", "set", "--no-cone", *SPARSE)
         git("checkout")
     else:
-        git("fetch", "--depth", "1", "origin")
+        git("fetch", "--depth", "1", "origin", "HEAD")
         git("reset", "--hard", "FETCH_HEAD")
 
 
@@ -72,6 +76,30 @@ def icon_theme(name, dark):
     return "breeze-dark" if dark else "breeze"
 
 
+def import_wallpapers(src):
+    """Copy a theme's backgrounds, skipping Omarchy's logo wallpaper and any
+    image another theme already brought (matte-black and vantablack share one).
+    Returns the theme's wallpapers, its default first."""
+    tid, walls = src.name, []
+    for f in sorted((src / "backgrounds").glob("*")):
+        stem = f.stem.lstrip("0123456789").lstrip("-")
+        if not f.is_file() or stem == "omarchy":
+            continue
+        digest = hashlib.md5(f.read_bytes()).hexdigest()
+        if digest in seen:
+            walls.append(seen[digest])
+            continue
+        # Drop the ordering number unless that collides (white has 1-white, 2-white...)
+        dest = WALLS / f"{tid}-{stem}{f.suffix}"
+        if dest in walls:
+            dest = WALLS / f"{tid}-{f.name}"
+        if not dest.exists() or dest.stat().st_mtime < f.stat().st_mtime:
+            shutil.copy2(f, dest)
+        seen[digest] = dest
+        walls.append(dest)
+    return walls
+
+
 def import_theme(src):
     tid = src.name
     c = resolve(tomllib.loads((src / "colors.toml").read_text()))
@@ -80,7 +108,8 @@ def import_theme(src):
     icons = icon_theme(icons_file.read_text().split()[0] if icons_file.exists() else "", dark)
     accent = c["accent"]
     secondary = c["blue"] if c["blue"] != accent else c["cyan"]
-    name = " ".join(w.capitalize() for w in tid.split("-")) + " (Omarchy)"
+    name = NAMES.get(tid) or " ".join(w.capitalize() for w in tid.split("-"))
+    walls = import_wallpapers(src)
 
     out = THEMES / f"omarchy-{tid}"
     out.mkdir(parents=True, exist_ok=True)
@@ -89,7 +118,8 @@ def import_theme(src):
         f"name = {name}\n\ngtk       = Breeze\nicons     = {icons}\n\n"
         f"bg        = {c['background']}\nbg_alt    = {c['lighter_background']}\n"
         f"fg        = {c['foreground']}\nprimary   = {accent}\nsecondary = {secondary}\n"
-        f"disabled  = {c['muted']}\nalert     = {c['red']}\n")
+        f"disabled  = {c['muted']}\nalert     = {c['red']}\n"
+        f"\nwallpaper = {walls[0] if walls else ''}\n")
     # Same ANSI layout as Omarchy's own foot.ini.tpl
     regular = ["background", "red", "green", "yellow", "blue", "magenta", "cyan", "foreground"]
     bright = ["muted", "bright_red", "bright_green", "bright_yellow", "bright_blue",
@@ -101,16 +131,6 @@ def import_theme(src):
               f"selection-background = {c['selection'][1:]}"]
     (out / "foot-colors.ini").write_text("\n".join(lines) + "\n")
 
-    walls = []
-    for f in sorted((src / "backgrounds").glob("*")):
-        if f.is_file():
-            # Drop the ordering number unless that collides (white has 1-white, 2-white...)
-            dest = WALLS / f"{tid}-{f.name.lstrip('0123456789').lstrip('-')}"
-            if dest in walls:
-                dest = WALLS / f"{tid}-{f.name}"
-            if not dest.exists() or dest.stat().st_mtime < f.stat().st_mtime:
-                shutil.copy2(f, dest)
-            walls.append(dest)
     return out, walls
 
 
@@ -127,7 +147,4 @@ if __name__ == "__main__":
     for p in [*THEMES.glob("omarchy-*"), *WALLS.iterdir()]:
         if p not in keep:
             shutil.rmtree(p) if p.is_dir() else p.unlink()
-    for p in GEN.glob("omarchy-*"):
-        if not (THEMES / p.name).exists():
-            shutil.rmtree(p)
     subprocess.run([str(HOME / ".local/bin/desk-gen")], check=True)
