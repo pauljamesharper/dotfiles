@@ -1,0 +1,10 @@
+[Unit]
+Description=Notify about Aurora updates and pending restarts
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Waits on the notification until it's answered or dismissed
+TimeoutStartSec=12h
+ExecStart=%h/.local/bin/update-notify

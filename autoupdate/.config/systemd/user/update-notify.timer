@@ -1,0 +1,9 @@
+[Unit]
+Description=Check for Aurora updates and pending restarts every two hours
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=2h
+
+[Install]
+WantedBy=timers.target

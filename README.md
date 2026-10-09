@@ -48,7 +48,7 @@ brew bundle --global              # install the Homebrew packages in ~/.Brewfile
 | Package | Links into `~` | What it's for |
 |---|---|---|
 | `alacritty` | `.config/alacritty/alacritty.toml` | Alacritty terminal. Colours come from `theme.toml`, which is generated, not tracked |
-| `autoupdate` | `.config/systemd/user/{mise,distrobox}-upgrade.{service,timer}` | Daily upgrades that Aurora's `uupd` leaves out: mise and its tools, and the packages in every distrobox |
+| `autoupdate` | `.config/systemd/user/{mise,distrobox}-upgrade.{service,timer}`, `update-notify.{service,timer}`, `.local/bin/update-notify` | Daily upgrades that Aurora's `uupd` leaves out: mise and its tools, and the packages in every distrobox. `update-notify` checks every two hours and notifies when an Aurora update is out (with "Update now", which runs `uupd`) and when one is staged and needs a restart (with "Restart now", KDE's restart dialog); each at most once a day |
 | `bash` | `.bashrc`, `.bash_profile` | Shell startup: mise activation, Universal Blue's bling, and aliases (`e` for `emacsclient -nw`, `fastfetch` using the config below) |
 | `atuin` | `.config/atuin/config.toml` | Shell history search |
 | `desk` | `.config/desk/themes/`, `.config/rofi/`, `.local/bin/desk-*`, Giants colours, icons and wallpapers | Switchable desktop themes and a wallpaper picker. See [Themes and wallpapers](#themes-and-wallpapers) |
@@ -302,7 +302,7 @@ mise run ollama-models
 
 # Daily mise and distrobox upgrades
 systemctl --user daemon-reload
-systemctl --user enable --now mise-upgrade.timer distrobox-upgrade.timer
+systemctl --user enable --now mise-upgrade.timer distrobox-upgrade.timer update-notify.timer
 
 # Calendars and contacts: authorise Google, then sync
 vdirsyncer discover

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# update-notify: tell me when an Aurora update is out, and when one is staged
+# and waiting for a reboot. Run by update-notify.timer; each version is
+# announced once a day at most, until it's installed or rebooted into.
+set -u
+STATE=~/.local/state/update-notify
+mkdir -p "$STATE"
+
+# Notify about $1 (a key) unless that was done in the last 20 hours; the
+# remaining arguments go to notify-send, and its chosen action is printed.
+notify_once() {
+    local key=$1; shift
+    [ -n "$(find "$STATE/$key" -mmin -1200 2>/dev/null)" ] && return 1
+    touch "$STATE/$key"
+    notify-send -a Updates -u critical "$@"
+}
+
+staged=$(rpm-ostree status --json | jq -r '.deployments[] | select(.staged) | .version // .checksum[:12]')
+if [ -n "$staged" ]; then
+    action=$(notify_once "staged-$staged" -i system-reboot \
+        -A reboot="Restart now" -A later="Later" \
+        "Restart to finish updating" "Aurora $staged is installed and takes effect after a restart.") || exit 0
+    # KDE's own restart dialog, so open windows get a chance to save
+    [ "$action" = reboot ] && qdbus-qt6 org.kde.LogoutPrompt /LogoutPrompt promptReboot
+    exit 0
+fi
+
+check=$(rpm-ostree upgrade --check 2>/dev/null)
+if grep -q '^AvailableUpdate' <<< "$check"; then
+    version=$(sed -n 's/^ *Version: *\([^ ]*\).*/\1/p' <<< "$check" | head -1)
+    action=$(notify_once "available-${version:-new}" -i system-software-update \
+        -A update="Update now" -A later="Tonight is fine" \
+        "Aurora update available" \
+        "Aurora ${version:-update} is out. uupd installs it overnight, or update now; you'll be told when to restart.") || exit 0
+    # Runs Universal Blue's updater now (asks for your password)
+    [ "$action" = update ] && systemctl start uupd.service && exec "$0"
+fi
