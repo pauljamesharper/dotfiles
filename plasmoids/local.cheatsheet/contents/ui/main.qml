@@ -23,11 +23,14 @@ PlasmoidItem {
             ["Super+Shift+Enter", "Terminal with tmux"],
             ["Super+B", "Brave"],
             ["Super+F", "Files (Dolphin)"],
+            ["Super+E", "Emacs"],
+            ["Super+D", "Discord"],
             ["Super+/", "This cheat sheet"] ] },
         { title: "Workspaces", keys: [
             ["Super+1…9, 0", "Go to workspace 1–10"],
             ["Super+Shift+1…9, 0", "Move window to workspace"],
-            ["Super+W", "Overview"] ] },
+            ["Super+W", "Overview"],
+            ["Super+G", "Grid of workspaces"] ] },
         { title: "Monitors", keys: [
             ["Super+O", "Focus other monitor"],
             ["Super+Shift+O", "Move window to other monitor"] ] },
@@ -38,7 +41,6 @@ PlasmoidItem {
             ["Super+Ctrl+H/J/K/L", "Resize window"],
             ["Super+. / Super+,", "Focus next / previous"],
             ["Super+PgUp", "Maximize"],
-            ["Super+D", "Show desktop"],
             ["Alt+Tab", "Switch windows"] ] },
         { title: "Tiling (Krohnkite)", keys: [
             ["Super+M", "Monocle layout"],
@@ -47,7 +49,9 @@ PlasmoidItem {
             ["Super+R", "Rotate layout"],
             ["Super+I", "More master windows"],
             ["Super+Shift+F", "Float all windows"] ] },
-        { title: "System", keys: [
+        { title: "Desktop", keys: [
+            ["Super+Shift+T", "Theme picker"],
+            ["Super+Shift+W", "Wallpaper picker"],
             ["Super+Escape", "Lock screen"],
             ["Super+X", "Power / log out menu"] ] }
     ]
