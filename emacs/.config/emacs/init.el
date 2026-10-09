@@ -126,6 +126,9 @@
 (set-frame-parameter nil 'alpha-background 90)
 (add-to-list 'default-frame-alist '(alpha-background . 90))
 
+  ;; Default font a third larger than the system monospace (Noto Sans Mono, 98)
+  (set-face-attribute 'default nil :height 131)
+
 
   ;; Short answers only please
 
