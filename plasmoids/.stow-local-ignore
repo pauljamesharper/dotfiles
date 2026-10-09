@@ -1,0 +1,2 @@
+# Installed by install.sh, not stow (Plasma rejects symlinked package files)
+.*

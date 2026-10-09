@@ -63,7 +63,7 @@ brew bundle --global              # install the Homebrew packages in ~/.Brewfile
 | `mise` | `.config/mise/config.toml` | Global tool list: Claude Code, opencode, Ollama, Python, uv, Node, vdirsyncer, khal, khard, todoman, beancount + beangulp, fava, and Emacs's helpers (pyright, ruff, shfmt, shellcheck) |
 | `ollama` | `.config/systemd/user/ollama.service` | Runs `ollama serve` as a user service |
 | `opencode` | `.config/opencode/opencode.jsonc` | opencode settings |
-| `plasmoids` | `.local/share/plasma/plasmoids/local.*` | Home-made panel widgets: numbered desktops, Open-Meteo weather, caffeine and a shortcut cheat sheet. See [Desktop](#desktop-kde-plasma-and-krohnkite) |
+| `plasmoids` | `local.*`, copied to `~/.local/share/plasma/plasmoids` by `plasmoids/install.sh` | Home-made panel widgets: numbered desktops, Open-Meteo weather, caffeine and a shortcut cheat sheet. Not stowed: Plasma rejects symlinked widget files. See [Desktop](#desktop-kde-plasma-and-krohnkite) |
 | `starship` | `.config/starship.toml` | Shell prompt |
 | `vdirsyncer` | `.config/vdirsyncer/config` | Syncs calendars and contacts between Google, EteSync and local folders |
 | `vscode` | `.config/Code/User/settings.json` | VS Code editor settings |
@@ -136,7 +136,11 @@ set up by hand.
   apart, then a cheat-sheet widget, the system tray and show desktop.
 - **Second screen's panel:** the same widgets.
 - **Widgets:** desktop numbers, weather, caffeine and the cheat sheet are
-  the `plasmoids` package; Fokus comes from the KDE Store (Add Widgets → Get
+  the `plasmoids` package. Plasma won't load a widget whose files are
+  symlinks out of its folder ("Path traversal attempt detected"), so
+  `plasmoids/install.sh` copies them instead of stow; after changing one, run
+  it and `systemctl --user restart plasma-plasmashell` (not
+  `plasmashell --replace`, which ties the bar to the terminal it ran in). Fokus comes from the KDE Store (Add Widgets → Get
   New Widgets). Clicking a desktop number switches to it through KWin's D-Bus
   `setCurrentDesktop`, since Plasma 6.7 doesn't let widgets call
   `VirtualDesktopInfo.requestActivate`. The weather widget defaults to
