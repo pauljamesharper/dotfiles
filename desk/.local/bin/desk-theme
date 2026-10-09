@@ -39,7 +39,9 @@ cp "$GEN/$id/alacritty.toml" ~/.config/alacritty/theme.toml
 { cat "$GEN/$id/colors.rasi"; printf 'configuration { icon-theme: "%s"; }\n' "$icons"; } \
     > ~/.config/rofi/colors.rasi
 kwriteconfig6 --file ~/.local/share/konsole/Desk.profile --group Appearance --key ColorScheme "$(get konsole)"
-wall=$(get wallpaper)
+# The wallpaper last picked under this theme, else the theme's own
+wall=$(cat ~/.local/state/desk/wallpapers/"$id" 2>/dev/null)
+[ "$wall" = slideshow ] || [ -f "$wall" ] || wall=$(get wallpaper)
 [ -n "$wall" ] && desk-wallpaper "$wall"
 echo "$id" > "$DESK/current"
 notify-send -a Theme -i preferences-desktop-theme "Theme: $(get name)" \

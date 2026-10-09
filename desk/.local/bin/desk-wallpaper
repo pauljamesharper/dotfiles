@@ -41,8 +41,9 @@ slide_thumb=$THUMBS/slideshow.jpg
 pick=$(printf "Giants slideshow\0icon\x1f$slide_thumb\x1finfo\x1fslideshow\n$list" |
     rofi -dmenu -i -no-custom -p "󰸉 Wallpaper" -show-icons -format i -theme ~/.config/rofi/wall.rasi) || exit 0
 
-if [ "$pick" = 0 ]; then
-    apply slideshow
-else
-    apply "$(printf '%s\n' "$entries" | sed -n "${pick}p")"
-fi
+if [ "$pick" = 0 ]; then choice=slideshow; else choice=$(printf '%s\n' "$entries" | sed -n "${pick}p"); fi
+apply "$choice"
+# Like Omarchy, remember the pick for the current theme; desk-theme restores it
+STATE=~/.local/state/desk/wallpapers
+mkdir -p "$STATE"
+echo "$choice" > "$STATE/$(cat ~/.config/desk/current 2>/dev/null || echo giants)"

@@ -147,6 +147,10 @@ Retro and Rosé Pine Moon, plus Omarchy's 22 (see `desk-omarchy` below).
   recolours Konsole (the `Desk` profile), Alacritty and rofi. A theme with a
   `wallpaper` in its `theme.conf` (a path, a file name under
   `~/.local/share/wallpapers`, or `slideshow`) switches the wallpaper too.
+  As in Omarchy, a wallpaper you pick under a theme becomes that theme's
+  wallpaper from then on (kept in `~/.local/state/desk/wallpapers`). The
+  older themes' wallpapers are in `wallpapers/Desk`, converted to WebP from
+  the Mango setup's wallhaven images.
 - **`desk-wallpaper`** (Meta+Shift+W) shows thumbnails of everything in
   `~/.local/share/wallpapers`, plus a slideshow of the 19 Giants wallpapers
   (credits in `Giants/CREDITS.md`).
