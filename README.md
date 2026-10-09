@@ -138,10 +138,9 @@ set up by hand.
 ### Themes and wallpapers
 
 The `desk` package, carried over from the earlier Aurora setup on Codeberg,
-gives the whole desktop one switchable colour theme. There are 13: Giants
-(the default, after Omarchy's Giants), Catppuccin, Doom One, Dracula,
-Everforest, GitHub Dark, Gruvbox, Kanagawa, Monokai, Moonfly, Nord, Retro and
-Rosé Pine Moon.
+gives the whole desktop one switchable colour theme: Giants (the default,
+after Omarchy's Giants), Doom One, Dracula, GitHub Dark, Monokai, Moonfly,
+Retro and Rosé Pine Moon, plus Omarchy's 22 (see `desk-omarchy` below).
 
 - **`desk-theme`** (Meta+Shift+T) shows a picker, or takes a theme id:
   `desk-theme nord`. It sets the KDE colour scheme, icons and GTK theme, and
@@ -178,7 +177,7 @@ cp ~/.local/share/konsole/Default.profile ~/.local/share/konsole/Desk.profile   
 kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile Desk.profile
 ```
 
-The other themes use [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)
+The older desk themes (all but Giants and Omarchy's) use [Colloid](https://github.com/vinceliuice/Colloid-icon-theme)
 icons and [Orchis](https://github.com/vinceliuice/Orchis-theme) GTK themes.
 Without them those themes still recolour everything, but icons and GTK apps
 fall back to Breeze:
