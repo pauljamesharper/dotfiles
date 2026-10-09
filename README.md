@@ -260,7 +260,7 @@ Meta is the Windows/Super key.
 | Meta+Q | Close window |
 | Meta+W | Overview |
 | Meta+G | Grid view of desktops |
-| Meta+D | Show desktop |
+| Meta+D | Discord (Show desktop is unbound; use the panel button) |
 | Meta+O | Move to the next screen |
 | Meta+1 … Meta+0 | Switch to desktop 1–10 |
 | Meta+Shift+1 … Meta+Shift+0 | Move window to desktop 1–10 |
