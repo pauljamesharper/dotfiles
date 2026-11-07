@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Proton VPN
+Comment=Start Proton VPN in the tray at login (it auto-connects to US)
+Exec=protonvpn-app --start-minimized
+Icon=proton-vpn-logo
+Terminal=false
+X-GNOME-Autostart-enabled=true

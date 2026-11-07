@@ -59,6 +59,16 @@
           "id": "omarchy.weather"
         },
         {
+          "id": "focustimer",
+          "type": "command",
+          "exec": "~/.config/omarchy/bar/scripts/focustimer",
+          "interval": 1,
+          "tooltip": "Focus Timer",
+          "onClick": "~/.config/omarchy/bar/scripts/focustimer toggle",
+          "onRightClick": "~/.config/omarchy/bar/scripts/focustimer show",
+          "onMiddleClick": "~/.config/omarchy/bar/scripts/focustimer stop"
+        },
+        {
           "id": "omarchy.system-update"
         }
       ],

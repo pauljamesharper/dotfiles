@@ -1,0 +1,77 @@
+#!/bin/bash
+# Focus Timer (Flatpak io.github.focustimerhq.FocusTimer) bar widget for the Omarchy bar.
+#   focustimer          print bar JSON (polled by the bar)
+#   focustimer toggle   start / pause / resume (opens the app if it isn't running)
+#   focustimer stop     stop the timer
+#   focustimer show     open the Focus Timer window
+set -u
+
+APP=io.github.focustimerhq.FocusTimer
+OBJ=/io/github/focustimerhq/FocusTimer
+TIMER=$APP.Timer
+ICON="󱎫"
+PAUSE_ICON="󰏤"
+
+call() { busctl --user --auto-start=no call "$APP" "$OBJ" "$@" 2>/dev/null; }
+prop() { busctl --user --auto-start=no get-property "$APP" "$OBJ" "$@" 2>/dev/null; }
+running() { busctl --user status "$APP" >/dev/null 2>&1; }
+launch() { setsid -f flatpak run "$APP" >/dev/null 2>&1; }
+
+label() {
+  case $1 in
+    pomodoro) echo "Focus" ;;
+    short-break) echo "Short break" ;;
+    long-break) echo "Long break" ;;
+    *) echo "$1" ;;
+  esac
+}
+
+status() {
+  if ! running; then
+    printf '{"text":"%s","tooltip":"Focus Timer (not running): click to open"}\n' "$ICON"
+    return
+  fi
+
+  local state
+  state=$(prop "$TIMER" State | cut -d'"' -f2)
+  if [[ -z $state || $state == stopped ]]; then
+    printf '{"text":"%s","tooltip":"Focus Timer: click to start, right-click for window"}\n' "$ICON"
+    return
+  fi
+
+  local now remaining mins secs icon paused
+  now=$(($(date +%s%N) / 1000))
+  remaining=$(call "$TIMER" GetRemaining x "$now" | awk '{print $2}')
+  remaining=$(((${remaining:-0} + 999999) / 1000000))
+  ((remaining < 0)) && remaining=0
+  mins=$((remaining / 60)) secs=$((remaining % 60))
+
+  icon=$ICON paused=""
+  if [[ $(call "$TIMER" IsPaused) == "b true" ]]; then
+    icon=$PAUSE_ICON paused=" (paused)"
+  fi
+
+  printf '{"text":"%s %02d:%02d","tooltip":"%s%s: click to pause/resume, middle-click to stop","class":"active"}\n' \
+    "$icon" "$mins" "$secs" "$(label "$state")" "$paused"
+}
+
+toggle() {
+  if ! running; then launch; return; fi
+  local state
+  state=$(prop "$TIMER" State | cut -d'"' -f2)
+  if [[ -z $state || $state == stopped ]]; then
+    call "$TIMER" Start
+  elif [[ $(call "$TIMER" IsPaused) == "b true" ]]; then
+    call "$TIMER" Resume
+  else
+    call "$TIMER" Pause
+  fi
+}
+
+case ${1:-status} in
+  status) status ;;
+  toggle) toggle ;;
+  stop) running && call "$TIMER" Stop ;;
+  show) if running; then call "$APP" ShowWindow s ""; else launch; fi ;;
+  *) echo "usage: focustimer [status|toggle|stop|show]" >&2; exit 2 ;;
+esac
