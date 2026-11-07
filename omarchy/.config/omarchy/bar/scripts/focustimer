@@ -9,7 +9,7 @@ set -u
 APP=io.github.focustimerhq.FocusTimer
 OBJ=/io/github/focustimerhq/FocusTimer
 TIMER=$APP.Timer
-ICON="󱎫"
+ICON="󰪯"  # egg (nf-md-egg)
 PAUSE_ICON="󰏤"
 
 call() { busctl --user --auto-start=no call "$APP" "$OBJ" "$@" 2>/dev/null; }

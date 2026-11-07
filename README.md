@@ -46,7 +46,7 @@ flatpak install --user flathub io.github.focustimerhq.FocusTimer
 
 ## Focus Timer widget
 
-Sits right of the weather in the bar. Shows the remaining time while a session runs.
+Sits right of the weather in the bar. Shows an egg icon, plus the remaining time while a session runs.
 
 - **Click**: start, pause or resume (opens Focus Timer if it isn't running)
 - **Right-click**: open the Focus Timer window
